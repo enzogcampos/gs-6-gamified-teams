@@ -1,5 +1,4 @@
-# Teste de release automática
-name: Versioning - Criar Tag e Release
+name: Versioning - Auto Tag & Release
 
 on:
   push:
@@ -7,26 +6,37 @@ on:
       - main
 
 jobs:
-  release:
+  versioning:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout do código
+      - name: ⬇ Checkout
         uses: actions/checkout@v3
-
-      - name: Configurar Java
-        uses: actions/setup-java@v3
         with:
-          java-version: '17'
-          distribution: 'temurin'
+          fetch-depth: 0
 
-      - name: Gerar documentação Javadoc
-        run: mvn javadoc:javadoc
+      - name: 🧮 Gerar número de versão automaticamente
+        id: version
+        run: |
+          latest_tag=$(git describe --tags `git rev-list --tags --max-count=1` 2>/dev/null || echo "v0.0.0")
+          echo "Última tag: $latest_tag"
+          version=${latest_tag#v}
+          major=$(echo $version | cut -d. -f1)
+          minor=$(echo $version | cut -d. -f2)
+          patch=$(echo $version | cut -d. -f3)
+          patch=$((patch+1))
+          new_tag="v$major.$minor.$patch"
+          echo "new_tag=$new_tag" >> $GITHUB_OUTPUT
 
-      - name: Criar Tag e Release
-        uses: ncipollo/release-action@v1
+      - name: 🏷️ Criar nova TAG
+        run: |
+          git tag ${{ steps.version.outputs.new_tag }}
+          git push origin ${{ steps.version.outputs.new_tag }}
+
+      - name: 📦 Criar Release
+        uses: softprops/action-gh-release@v1
         with:
-          tag: v1.${{ github.run_number }}
-          name: Release v1.${{ github.run_number }}
-          body: "Release automática gerada pelo GitHub Actions"
-          token: ${{ secrets.GITHUB_TOKEN }}
+          tag_name: ${{ steps.version.outputs.new_tag }}
+          name: "Release ${{ steps.version.outputs.new_tag }}"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
