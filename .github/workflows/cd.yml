@@ -1,42 +1,39 @@
-name: Versioning - Auto Tag & Release
+name: CD - Continuous Delivery
 
 on:
-  push:
+  pull_request:
     branches:
-      - main
+      - develop
 
 jobs:
-  versioning:
+  cd:
     runs-on: ubuntu-latest
 
     steps:
       - name: ⬇ Checkout
         uses: actions/checkout@v3
+
+      - name: ☕ Setup Java
+        uses: actions/setup-java@v3
         with:
-          fetch-depth: 0
+          distribution: 'temurin'
+          java-version: '17'
 
-      - name: 🧮 Gerar número de versão automaticamente
-        id: version
-        run: |
-          latest_tag=$(git describe --tags `git rev-list --tags --max-count=1` 2>/dev/null || echo "v0.0.0")
-          echo "Última tag: $latest_tag"
-          version=${latest_tag#v}
-          major=$(echo $version | cut -d. -f1)
-          minor=$(echo $version | cut -d. -f2)
-          patch=$(echo $version | cut -d. -f3)
-          patch=$((patch+1))
-          new_tag="v$major.$minor.$patch"
-          echo "new_tag=$new_tag" >> $GITHUB_OUTPUT
+      - name: 🛠 Build aplicação
+        run: mvn clean package -DskipTests
 
-      - name: 🏷️ Criar nova TAG
-        run: |
-          git tag ${{ steps.version.outputs.new_tag }}
-          git push origin ${{ steps.version.outputs.new_tag }}
+      - name: 🔧 Setup Docker
+        uses: docker/setup-buildx-action@v2
 
-      - name: 📦 Criar Release
-        uses: softprops/action-gh-release@v1
+      - name: 🔐 Login no Docker Hub
+        uses: docker/login-action@v2
         with:
-          tag_name: ${{ steps.version.outputs.new_tag }}
-          name: "Release ${{ steps.version.outputs.new_tag }}"
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: 🐳 Build e Push da imagem
+        uses: docker/build-push-action@v4
+        with:
+          context: .
+          push: true
+          tags: enzog14/gs-6-gamified-teams:latest
