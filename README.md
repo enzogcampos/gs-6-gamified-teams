@@ -54,7 +54,7 @@ Acessar no navegador:
 📦 Imagem no Docker Hub
 
 (Adicione sua URL após publicar)
-https://hub.docker.com/r/SEU_USUARIO/gs-6-gamified-teams
+https://hub.docker.com/r/enzog14/gs-6-gamified-teams
 
 🔁 Workflows CI/CD – GitHub Actions
 🛠️ 1. CI – Continuous Integration
@@ -99,6 +99,8 @@ O nome do repositório deve seguir exatamente o padrão solicitado:
 gs-6-gamified-teams
 
 Prints das execuções CI, CD e Versioning devem ser anexados na entrega.
+
+
 
 🔗 Endpoint principal
 GET /info
