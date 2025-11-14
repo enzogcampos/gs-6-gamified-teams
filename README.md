@@ -105,6 +105,12 @@ Prints das execuções CI, CD e Versioning devem ser anexados na entrega.
 🔗 Endpoint principal
 GET /info
 
+<img width="1360" height="580" alt="image" src="https://github.com/user-attachments/assets/fedd4354-d1d0-4119-8d11-805b8da9b164" />
+
+<img width="1363" height="563" alt="image" src="https://github.com/user-attachments/assets/b26200f9-8f89-40d6-9754-0f46d243d8c4" />
+
+
+
 <img width="1365" height="638" alt="image docker hub" src="https://github.com/user-attachments/assets/8bc738a5-c27e-44c2-a55f-a4c04de22d5a" />
 
 
