@@ -1,28 +1,29 @@
-name: CI - Build, Testes e Verificação Docker
+name: CI - Continuous Integration
 
 on:
   push:
     branches:
-      - feature/**
-      - release
-      - hotfix
+      - "feature/**"
+      - "release"
+      - "hotfix"
 
 jobs:
-  build:
+  ci:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout do código
+      - name: ⬇ Checkout
         uses: actions/checkout@v3
 
-      - name: Configurar Java
+      - name: ☕ Setup Java
         uses: actions/setup-java@v3
         with:
-          java-version: '17'
           distribution: 'temurin'
+          java-version: '17'
 
-      - name: Build e Testes Maven
+      - name: 📦 Instalar dependências + rodar testes
         run: mvn clean verify
 
-      - name: Build da imagem Docker (verificação)
-        run: docker build -t gs4-test .
+      - name: 🐳 Build Docker (verificação)
+        run: |
+          docker build -t teste-ci-gs .
